@@ -33,8 +33,8 @@ module.exports = {
         },
 
         faderight: {
-          from: { transform: "translateX(-50px)", opacity: "0.5" },
-          start: { transform: "translateX(0px)", opacity: "1" },
+          from: { transform: "translateX(-30px)", opacity: "1" },
+          start: { transform: "translateX(0px)", opacity: "0" },
         },
       },
       animation: {
