@@ -7,6 +7,8 @@
              .make a function that tells the number of active todos
 2. delete Todo
 3. complete Todo
+     .make text of that todo line through
+     .change result in todos array (iscompleted:true)
 4. active Todo func
 5. filter for all
 6. filter for active
@@ -18,6 +20,23 @@ const inputField = document.querySelector("#input-field");
 const todoBox = document.querySelector("#todo-box");
 const emptyTodo = document.querySelector("#empty-todo");
 const filterList = document.querySelector("#filter-list");
+const themeSwitcher = document.querySelector(".theme-switcher");
+const backgroundBanner = document.querySelector(".background-banner");
+
+// Dark mode
+let isDark = true;
+themeSwitcher.addEventListener("click", () => {
+  document.querySelector("html").classList.toggle("dark");
+
+  backgroundBanner.src = isDark
+    ? "images/bg-desktop-dark.jpg"
+    : "images/bg-desktop-light.jpg";
+
+  themeSwitcher.src = isDark ? "images/icon-sun.svg" : "images/icon-moon.svg";
+
+  isDark = !isDark;
+  console.log(isDark);
+});
 
 const todos = [];
 const addTodo = () => {
