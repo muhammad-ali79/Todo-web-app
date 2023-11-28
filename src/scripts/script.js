@@ -9,7 +9,8 @@
 3. complete Todo
      .make text of that todo line through
      .change result in todos array (iscompleted:true)
-4. active Todo func
+4. itemsleft func
+         .only look for is completed===false and count them and show theri number
 5. filter for all
 6. filter for active
 7. filter for completed
@@ -22,6 +23,7 @@ const emptyTodo = document.querySelector("#empty-todo");
 const filterList = document.querySelector("#filter-list");
 const themeSwitcher = document.querySelector(".theme-switcher");
 const backgroundBanner = document.querySelector(".background-banner");
+const leftTodos = document.querySelector(".left-todos");
 
 // Dark mode
 let isDark = true;
@@ -37,6 +39,14 @@ themeSwitcher.addEventListener("click", () => {
   isDark = !isDark;
   console.log(isDark);
 });
+
+const itemsleft = () => {
+  let count = 0;
+  todos.filter((todo) => {
+    if (todo.iscompleted === false) count += 1;
+  });
+  leftTodos.textContent = count;
+};
 
 const todos = [];
 const addTodo = () => {
@@ -58,6 +68,8 @@ const addTodo = () => {
   todos.push({ id: todos.length + 1, title: todoText, iscompleted: false });
   inputField.value = "";
   todoBox.insertBefore(listItem, filterList);
+
+  itemsleft();
 };
 
 const findIndex = (all, targeted) => {
@@ -87,6 +99,7 @@ const deleteTodo = (e) => {
     const index = findIndex(items, itemTodelete);
     if (index != -1) todos.splice(index, 1);
   }
+  itemsleft();
 };
 
 // Delete Todo
@@ -115,6 +128,7 @@ const completeTodo = (e) => {
       todos[index].iscompleted = false;
     }
   }
+  itemsleft();
 };
 
 document.querySelector("#input-field").addEventListener("keydown", (e) => {
