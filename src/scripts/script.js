@@ -46,9 +46,9 @@ const addTodo = () => {
     "todo-list relative flex items-center w-full py-[0.95rem] px-4 border-b border-bordercolor dark:border-bordercolor-dark transiton-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)] rounded-sm animate-fadeleft";
 
   listItem.innerHTML = `
-    <input type="checkbox" name="" id="checkbox" class="absolute top-1/2 left-4 w-[18px] h-[18px] border border-bordercolor dark:border-bordercolor-dark rounded-full -translate-y-1/2 appearance-none outline-none cursor-pointer transition-all duration-500 ease-[cubic-bezier(.37,0,.63,1)] xs:w-6 xs:h-6 checked:bg-gradient-to-t from-[#57ddff] to-[#c058f3] checked:border-none checked:after:absolute checked:after:top-0 checked:after:left-0 checked:after:w-full checked:after:h-full checked:after:content-[''] checked:after:bg-no-repeat checked:after:bg-[50%]"/>
+    <input type="checkbox" name="" id="checkbox" class="checkbox absolute top-1/2 left-4 w-[18px] h-[18px] border border-bordercolor dark:border-bordercolor-dark rounded-full -translate-y-1/2 appearance-none outline-none cursor-pointer transition-all duration-500 ease-[cubic-bezier(.37,0,.63,1)] xs:w-6 xs:h-6 checked:bg-gradient-to-t from-[#57ddff] to-[#c058f3] checked:border-none checked:after:absolute checked:after:top-0 checked:after:left-0 checked:after:w-full checked:after:h-full checked:after:content-[''] checked:after:bg-no-repeat checked:after:bg-[50%]"/>
   
-  <span class="flex-grow ml-7 xs:ml-[2.2rem] text-color dark:text-color-dark transition-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)]">${todoText}</span>
+  <span class="flex-grow  ml-7 xs:ml-[2.2rem] text-color dark:text-color-dark transition-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)]">${todoText}</span>
   
   <button class="flex [all:unset] cursor-pointer">
     <img src="images/icon-cross.svg" alt=""  class="w-[11px] xs:w-[13px] cursor-pointer delete-btn"/>
@@ -58,6 +58,14 @@ const addTodo = () => {
   todos.push({ id: todos.length + 1, title: todoText, iscompleted: false });
   inputField.value = "";
   todoBox.insertBefore(listItem, filterList);
+};
+
+const findIndex = (all, targeted) => {
+  let index = -1;
+  for (let i = 0; i < all.length; i++) {
+    if (all[i] === targeted) index = i;
+  }
+  return index;
 };
 
 // Delete Todo
@@ -76,14 +84,36 @@ const deleteTodo = (e) => {
       todoBox.removeChild(itemTodelete);
     });
 
-    let index = -1;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i] === itemTodelete) {
-        index = i;
-      }
-    }
-    console.log(index);
+    const index = findIndex(items, itemTodelete);
     if (index != -1) todos.splice(index, 1);
+  }
+};
+
+// Delete Todo
+const completeTodo = (e) => {
+  const checkbox = e.target;
+  const text = checkbox.nextElementSibling;
+  const todolist = e.target.closest("li");
+  const items = document.querySelectorAll(".todo-list");
+
+  if (e.target.classList.contains("checkbox")) {
+    const index = findIndex(items, todolist);
+
+    if (checkbox.checked) {
+      text.classList.add(
+        "line-through",
+        "text-checkedcolor",
+        "dark:text-checkedcolor-dark"
+      );
+      todos[index].iscompleted = true;
+    } else {
+      text.classList.remove(
+        "line-through",
+        "text-checkedcolor",
+        "dark:text-checkedcolor-dark"
+      );
+      todos[index].iscompleted = false;
+    }
   }
 };
 
@@ -96,5 +126,5 @@ document.querySelector("#input-field").addEventListener("keydown", (e) => {
 
 todoBox.addEventListener("click", (e) => {
   deleteTodo(e);
-  console.log(todos);
+  completeTodo(e);
 });
