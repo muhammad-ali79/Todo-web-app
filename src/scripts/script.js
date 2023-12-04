@@ -13,9 +13,11 @@
          .only look for is completed===false and count them and show theri number
 5. filter for all
 6. filter for active
+         . filter for only whose checkbox is checked  and delete them
 7. filter for completed
 8. clear completed
 */
+// select the both two filter ul and preform the functionality according to which one is clicked
 
 const inputField = document.querySelector("#input-field");
 const todoBox = document.querySelector("#todo-box");
@@ -24,6 +26,11 @@ const filterList = document.querySelector("#filter-list");
 const themeSwitcher = document.querySelector(".theme-switcher");
 const backgroundBanner = document.querySelector(".background-banner");
 const leftTodos = document.querySelector(".left-todos");
+const allTodosbtn = document.querySelectorAll(".all-todos");
+const activeTodosbtn = document.querySelectorAll(".active-todos");
+const completeTodosbtn = document.querySelectorAll(".completed-todos");
+const clearCompletebtn = document.querySelector(".clear-complete");
+const allFilterbtns = document.querySelectorAll(".filter-btns");
 
 // Dark mode
 let isDark = true;
@@ -37,7 +44,6 @@ themeSwitcher.addEventListener("click", () => {
   themeSwitcher.src = isDark ? "images/icon-sun.svg" : "images/icon-moon.svg";
 
   isDark = !isDark;
-  console.log(isDark);
 });
 
 const itemsleft = () => {
@@ -48,7 +54,7 @@ const itemsleft = () => {
   leftTodos.textContent = count;
 };
 
-const todos = [];
+let todos = [];
 const addTodo = () => {
   const todoText = inputField.value.trim();
   const listItem = document.createElement("li");
@@ -72,6 +78,10 @@ const addTodo = () => {
   itemsleft();
 };
 
+const showEmptyDiv = () => {
+  if (todos.length === 0) todoBox.prepend(emptyTodo);
+};
+
 const findIndex = (all, targeted) => {
   let index = -1;
   for (let i = 0; i < all.length; i++) {
@@ -84,33 +94,38 @@ const findIndex = (all, targeted) => {
 const deleteTodo = (e) => {
   const itemTodelete = e.target.closest("li");
   // select all the todo lists
-  const items = document.querySelectorAll(".todo-list");
+  const allTodos = document.querySelectorAll(".todo-list");
 
   // if only clicked button conatins the class of delete-btn then procced because evenListener is attached to the parent element (todoBox) (event delegation)
   if (e.target.classList.contains("delete-btn")) {
     // itemTodelete.classList.remove("aniamte-fadeleft");
-    itemTodelete.classList.remove("animate-fadeleft");
+    // itemTodelete.classList.remove("animate-fadeleft");
     itemTodelete.classList.add("animate-faderight");
+
+    // const removeTodo = ()=>{
+
+    // }
 
     itemTodelete.addEventListener("animationend", () => {
       todoBox.removeChild(itemTodelete);
     });
 
-    const index = findIndex(items, itemTodelete);
+    const index = findIndex(allTodos, itemTodelete);
     if (index != -1) todos.splice(index, 1);
   }
   itemsleft();
+  showEmptyDiv();
 };
 
-// Delete Todo
+// complete Todo
 const completeTodo = (e) => {
   const checkbox = e.target;
   const text = checkbox.nextElementSibling;
-  const todolist = e.target.closest("li");
-  const items = document.querySelectorAll(".todo-list");
+  const targetTodo = e.target.closest("li");
+  const allTodos = document.querySelectorAll(".todo-list");
 
   if (e.target.classList.contains("checkbox")) {
-    const index = findIndex(items, todolist);
+    const index = findIndex(allTodos, targetTodo);
 
     if (checkbox.checked) {
       text.classList.add(
@@ -119,6 +134,7 @@ const completeTodo = (e) => {
         "dark:text-checkedcolor-dark"
       );
       todos[index].iscompleted = true;
+      targetTodo.classList.add("completed");
     } else {
       text.classList.remove(
         "line-through",
@@ -126,6 +142,7 @@ const completeTodo = (e) => {
         "dark:text-checkedcolor-dark"
       );
       todos[index].iscompleted = false;
+      targetTodo.classList.remove("completed");
     }
   }
   itemsleft();
@@ -142,3 +159,139 @@ todoBox.addEventListener("click", (e) => {
   deleteTodo(e);
   completeTodo(e);
 });
+
+const giveTargetColor = () => {
+  allFilterbtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      allFilterbtns.forEach((sibling) => {
+        sibling === btn
+          ? sibling.classList.add("text-[#3a7bfd]")
+          : sibling.classList.remove("text-[#3a7bfd]");
+      });
+    });
+  });
+};
+
+const removeHidden = () => {
+  const allTodoLists = document.querySelectorAll(".todo-list");
+  allTodoLists.forEach((todo) => {
+    if (todo.classList.contains("hidden")) todo.classList.remove("hidden");
+  });
+};
+
+const active = () => {
+  removeHidden();
+
+  const addHidden = (todo) => {
+    todo.classList.add("animate-faderight");
+
+    setTimeout(() => {
+      todo.classList.add("hidden");
+      todo.classList.remove("animate-faderight");
+    }, 500);
+  };
+
+  const completeTodos = document.querySelectorAll(".completed");
+
+  completeTodos.forEach((todo) => {
+    addHidden(todo);
+  });
+
+  const remove = (e) => {
+    if (e.target.classList.contains("checkbox")) {
+      const checkbox = e.target;
+      const completeTodo = checkbox.closest("li");
+
+      if (checkbox.checked) {
+        addHidden(completeTodo);
+      }
+    }
+  };
+
+  const func = function (e) {
+    remove(e); // Creating a wrapper function to pass 'e' to 'remove'
+  };
+
+  // Adding the event listener with the correct function reference
+  todoBox.addEventListener("click", func);
+
+  // Removing the event listener with the same function reference
+  todoBox.removeEventListener("click", func);
+
+  giveTargetColor();
+};
+
+////////////////////
+const all = () => {
+  removeHidden();
+
+  todoBox.addEventListener("click", removeHidden);
+  todoBox.removeEventListener("click", removeHidden);
+  giveTargetColor();
+};
+
+////////////////////
+const complete = () => {
+  const addHidden = () => {
+    const allTodoLists = document.querySelectorAll(".todo-list");
+
+    allTodoLists.forEach((todo) => {
+      if (!todo.classList.contains("completed")) {
+        todo.classList.add("hidden");
+      }
+    });
+  };
+
+  removeHidden();
+  addHidden();
+  // whenever new todolist is through Enter
+  inputField.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      addHidden();
+    }
+  });
+
+  const checkBox = (e) => {
+    if (e.target.classList.contains("checkbox")) {
+      const checkboxes = document.querySelectorAll(".checkbox");
+      checkboxes.forEach((check) => {
+        if (!check.checked) addHidden();
+      });
+    }
+  };
+
+  const bound = (e) => checkBox(e);
+
+  todoBox.addEventListener("click", bound);
+  todoBox.removeEventListener("click", bound);
+
+  giveTargetColor();
+};
+
+// Active buttons
+activeTodosbtn.forEach((btn) => {
+  btn.addEventListener("click", active);
+});
+
+// show all Todos buttons
+allTodosbtn.forEach((btn) => {
+  btn.addEventListener("click", all);
+});
+
+// show completed Todos buttons
+completeTodosbtn.forEach((btn) => {
+  btn.addEventListener("click", complete);
+});
+
+// clear completes
+clearCompletebtn.addEventListener("click", () => {
+  const allCompleteTodos = document.querySelectorAll(".completed");
+  allCompleteTodos.forEach((todo) => {
+    todo.remove();
+  });
+
+  todos = todos.filter((todo) => todo.iscompleted === false);
+  showEmptyDiv();
+});
+
+//

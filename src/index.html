@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -89,25 +89,25 @@
             >
               <span><span class="left-todos">0</span> items left</span>
               <!-- hidden on medium screens -->
-              <ul class="hidden gap-x-3 md:flex">
+              <ul class="hidden gap-x-3 md:flex" id="on-medium">
                 <li
-                  class="cursor-pointer text-[#3a7bfd] transition-colors duration-300 ease-in hover:text-[#393a4c]"
+                  class="filter-btns all-todos cursor-pointer text-[#3a7bfd] transition-colors duration-300 ease-in hover:text-[#393a4c]"
                 >
                   All
                 </li>
                 <li
-                  class="cursor-pointer transition-colors duration-300 ease-linear hover:text-[#393a4c]"
+                  class="filter-btns active-todos cursor-pointer transition-colors duration-300 ease-linear hover:text-[#393a4c]"
                 >
                   Active
                 </li>
                 <li
-                  class="cursor-pointer transition-colors duration-300 ease-linear hover:text-[#393a4c]"
+                  class="filter-btns completed-todos cursor-pointer transition-colors duration-300 ease-linear hover:text-[#393a4c]"
                 >
                   Completed
                 </li>
               </ul>
               <button
-                class="transition-colors duration-300 ease-linear hover:text-[#393a4c]"
+                class="clear-complete transition-colors duration-300 ease-linear hover:text-[#393a4c]"
               >
                 Clear Completed
               </button>
@@ -116,19 +116,20 @@
           <!-- For screens less than medium (means show on small screens)-->
           <ul
             class="my-4 flex items-center justify-center gap-x-3 rounded-md bg-bgcard px-4 py-[0.75rem] text-xs font-bold text-[#777a92] transition-colors duration-[.5s] ease-[cubic-bezier(.37,0,.63,1)] dark:bg-bgcard-dark xs:text-base md:hidden"
+            id="on-mobile"
           >
             <li
-              class="cursor-pointer text-[#3a7bfd] transition-colors duration-300 ease-in hover:text-[#393a4c]"
+              class="filter-btns all-todos cursor-pointer text-[#3a7bfd] transition-colors duration-300 ease-in hover:text-[#393a4c]"
             >
               All
             </li>
             <li
-              class="cursor-pointer transition-colors duration-300 ease-linear hover:text-[#393a4c]"
+              class="filter-btns active-todos cursor-pointer transition-colors duration-300 ease-linear hover:text-[#393a4c]"
             >
               Active
             </li>
             <li
-              class="cursor-pointer transition-colors duration-300 ease-linear hover:text-[#393a4c]"
+              class="filter-btns completed-todos cursor-pointer transition-colors duration-300 ease-linear hover:text-[#393a4c]"
             >
               Completed
             </li>
