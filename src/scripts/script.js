@@ -152,6 +152,7 @@ document.querySelector("#input-field").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && inputField.value != "") {
     addTodo();
     emptyTodo.remove();
+    console.log("from eventLsitener");
   }
 });
 
@@ -179,17 +180,17 @@ const removeHidden = () => {
   });
 };
 
+const addHidden = (todo) => {
+  todo.classList.add("animate-faderight");
+
+  setTimeout(() => {
+    todo.classList.add("hidden");
+    todo.classList.remove("animate-faderight");
+  }, 500);
+};
+
 const active = () => {
   removeHidden();
-
-  const addHidden = (todo) => {
-    todo.classList.add("animate-faderight");
-
-    setTimeout(() => {
-      todo.classList.add("hidden");
-      todo.classList.remove("animate-faderight");
-    }, 500);
-  };
 
   const completeTodos = document.querySelectorAll(".completed");
 
@@ -198,25 +199,20 @@ const active = () => {
   });
 
   const remove = (e) => {
-    if (e.target.classList.contains("checkbox")) {
-      const checkbox = e.target;
-      const completeTodo = checkbox.closest("li");
+    activeTodosbtn.forEach((btn) => {
+      const hasColor = btn.classList.contains("text-[#3a7bfd]");
 
-      if (checkbox.checked) {
+      if (e.target.checked && hasColor) {
+        console.log("from active single");
+        const completeTodo = e.target.closest("li");
         addHidden(completeTodo);
       }
-    }
+    });
   };
 
-  const func = function (e) {
-    remove(e); // Creating a wrapper function to pass 'e' to 'remove'
-  };
-
-  // Adding the event listener with the correct function reference
-  todoBox.addEventListener("click", func);
-
-  // Removing the event listener with the same function reference
-  todoBox.removeEventListener("click", func);
+  todoBox.addEventListener("click", function (e) {
+    remove(e);
+  });
 
   giveTargetColor();
 };
@@ -224,46 +220,62 @@ const active = () => {
 ////////////////////
 const all = () => {
   removeHidden();
-
-  todoBox.addEventListener("click", removeHidden);
-  todoBox.removeEventListener("click", removeHidden);
   giveTargetColor();
 };
 
 ////////////////////
 const complete = () => {
-  const addHidden = () => {
+  const addHiddenComplete = () => {
     const allTodoLists = document.querySelectorAll(".todo-list");
 
     allTodoLists.forEach((todo) => {
       if (!todo.classList.contains("completed")) {
-        todo.classList.add("hidden");
+        addHidden(todo);
       }
     });
   };
 
   removeHidden();
-  addHidden();
-  // whenever new todolist is through Enter
-  inputField.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      addHidden();
-    }
-  });
+  addHiddenComplete();
 
-  const checkBox = (e) => {
-    if (e.target.classList.contains("checkbox")) {
-      const checkboxes = document.querySelectorAll(".checkbox");
-      checkboxes.forEach((check) => {
-        if (!check.checked) addHidden();
-      });
+  const hasColor = () => {
+    let giveBoolean;
+    completeTodosbtn.forEach((btn) => {
+      if (btn.classList.contains("text-[#3a7bfd]")) {
+        giveBoolean = true;
+      }
+    });
+    console.log(giveBoolean);
+    return giveBoolean;
+  };
+
+  const checkKey = function (e) {
+    if (e.key === "Enter" && hasColor()) {
+      console.log("from complete");
+      addHiddenComplete();
     }
   };
 
-  const bound = (e) => checkBox(e);
+  // whenever new todolist is through Enter
+  inputField.addEventListener("keydown", (e) => {
+    checkKey(e);
+  });
 
-  todoBox.addEventListener("click", bound);
-  todoBox.removeEventListener("click", bound);
+  // Whenever todolist is toggle from checked to unchecked
+  const checkChecbox = (e) => {
+    if (
+      e.target.classList.contains("checkbox") &&
+      !e.target.checked &&
+      hasColor()
+    ) {
+      console.log("from toggle complete");
+      e.target.closest("li").classList.add("hidden");
+    }
+  };
+
+  todoBox.addEventListener("click", (e) => {
+    checkChecbox(e);
+  });
 
   giveTargetColor();
 };
@@ -293,5 +305,3 @@ clearCompletebtn.addEventListener("click", () => {
   todos = todos.filter((todo) => todo.iscompleted === false);
   showEmptyDiv();
 });
-
-//
