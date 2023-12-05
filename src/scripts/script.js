@@ -21,7 +21,7 @@
 
 const inputField = document.querySelector("#input-field");
 const todoBox = document.querySelector("#todo-box");
-const emptyTodo = document.querySelector("#empty-todo");
+const emptyTodoDiv = document.querySelector("#empty-todo");
 const filterList = document.querySelector("#filter-list");
 const themeSwitcher = document.querySelector(".theme-switcher");
 const backgroundBanner = document.querySelector(".background-banner");
@@ -78,8 +78,20 @@ const addTodo = () => {
   itemsleft();
 };
 
-const showEmptyDiv = () => {
-  if (todos.length === 0) todoBox.prepend(emptyTodo);
+const showEmptyDiv = (milliSeconds) => {
+  if (todos.length === 0)
+    setTimeout(() => {
+      todoBox.prepend(emptyTodoDiv);
+    }, milliSeconds);
+};
+
+const showEmptyDivActive = (boolean, milliSeconds) => {
+  const arr = todos.filter((todo) => todo.iscompleted === boolean);
+
+  if (arr.length === 0)
+    setTimeout(() => {
+      todoBox.prepend(emptyTodoDiv);
+    }, milliSeconds);
 };
 
 const findIndex = (all, targeted) => {
@@ -96,15 +108,8 @@ const deleteTodo = (e) => {
   // select all the todo lists
   const allTodos = document.querySelectorAll(".todo-list");
 
-  // if only clicked button conatins the class of delete-btn then procced because evenListener is attached to the parent element (todoBox) (event delegation)
   if (e.target.classList.contains("delete-btn")) {
-    // itemTodelete.classList.remove("aniamte-fadeleft");
-    // itemTodelete.classList.remove("animate-fadeleft");
     itemTodelete.classList.add("animate-faderight");
-
-    // const removeTodo = ()=>{
-
-    // }
 
     itemTodelete.addEventListener("animationend", () => {
       todoBox.removeChild(itemTodelete);
@@ -114,7 +119,7 @@ const deleteTodo = (e) => {
     if (index != -1) todos.splice(index, 1);
   }
   itemsleft();
-  showEmptyDiv();
+  showEmptyDiv(500);
 };
 
 // complete Todo
@@ -151,7 +156,7 @@ const completeTodo = (e) => {
 document.querySelector("#input-field").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && inputField.value != "") {
     addTodo();
-    emptyTodo.remove();
+    emptyTodoDiv.remove();
     console.log("from eventLsitener");
   }
 });
@@ -171,6 +176,7 @@ const giveTargetColor = () => {
       });
     });
   });
+  console.log("from target colors function");
 };
 
 const removeHidden = () => {
@@ -190,6 +196,9 @@ const addHidden = (todo) => {
 };
 
 const active = () => {
+  emptyTodoDiv.remove();
+  showEmptyDivActive(false, 0);
+  giveTargetColor();
   removeHidden();
 
   const completeTodos = document.querySelectorAll(".completed");
@@ -198,33 +207,42 @@ const active = () => {
     addHidden(todo);
   });
 
-  const remove = (e) => {
+  const removeCompletedTodos = (e) => {
     activeTodosbtn.forEach((btn) => {
       const hasColor = btn.classList.contains("text-[#3a7bfd]");
 
-      if (e.target.checked && hasColor) {
+      if (
+        e.target.classList.contains("checkbox") &&
+        e.target.checked &&
+        hasColor
+      ) {
         console.log("from active single");
         const completeTodo = e.target.closest("li");
         addHidden(completeTodo);
+        showEmptyDivActive(false, 500);
       }
     });
   };
 
-  todoBox.addEventListener("click", function (e) {
-    remove(e);
+  todoBox.addEventListener("click", (e) => {
+    removeCompletedTodos(e);
   });
-
-  giveTargetColor();
 };
 
 ////////////////////
 const all = () => {
-  removeHidden();
+  emptyTodoDiv.remove();
+  showEmptyDiv(0);
   giveTargetColor();
+  removeHidden();
 };
 
 ////////////////////
 const complete = () => {
+  emptyTodoDiv.remove();
+  showEmptyDivActive(true, 0);
+  giveTargetColor();
+
   const addHiddenComplete = () => {
     const allTodoLists = document.querySelectorAll(".todo-list");
 
@@ -249,10 +267,11 @@ const complete = () => {
     return giveBoolean;
   };
 
-  const checkKey = function (e) {
+  const checkKey = (e) => {
     if (e.key === "Enter" && hasColor()) {
       console.log("from complete");
       addHiddenComplete();
+      showEmptyDivActive(true, 500);
     }
   };
 
@@ -270,14 +289,13 @@ const complete = () => {
     ) {
       console.log("from toggle complete");
       e.target.closest("li").classList.add("hidden");
+      showEmptyDivActive(true, 0);
     }
   };
 
   todoBox.addEventListener("click", (e) => {
     checkChecbox(e);
   });
-
-  giveTargetColor();
 };
 
 // Active buttons
@@ -305,3 +323,6 @@ clearCompletebtn.addEventListener("click", () => {
   todos = todos.filter((todo) => todo.iscompleted === false);
   showEmptyDiv();
 });
+
+// color issue on first click (serious)
+// why code is executed so many times
