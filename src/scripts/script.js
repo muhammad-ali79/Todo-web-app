@@ -31,19 +31,28 @@ const activeTodosbtn = document.querySelectorAll(".active-todos");
 const completeTodosbtn = document.querySelectorAll(".completed-todos");
 const clearCompletebtn = document.querySelector(".clear-complete");
 const allFilterbtns = document.querySelectorAll(".filter-btns");
+const body = document.querySelector("body");
 
 // Dark mode
-let isDark = true;
+let isDark = false;
+
+const setTheme = (theme) => {
+  if (theme === true || theme === "true") {
+    body.classList.add("dark");
+    backgroundBanner.src = "images/bg-desktop-dark.jpg";
+    themeSwitcher.src = "images/icon-sun.svg";
+  } else {
+    body.classList.remove("dark");
+    backgroundBanner.src = "images/bg-desktop-light.jpg";
+    themeSwitcher.src = "images/icon-moon.svg";
+  }
+};
+
 themeSwitcher.addEventListener("click", () => {
-  document.querySelector("html").classList.toggle("dark");
-
-  backgroundBanner.src = isDark
-    ? "images/bg-desktop-dark.jpg"
-    : "images/bg-desktop-light.jpg";
-
-  themeSwitcher.src = isDark ? "images/icon-sun.svg" : "images/icon-moon.svg";
-
   isDark = !isDark;
+  localStorage.setItem("isDark", isDark.toString());
+
+  setTheme(isDark);
 });
 
 const itemsleft = () => {
@@ -55,27 +64,35 @@ const itemsleft = () => {
 };
 
 let todos = [];
+
 const addTodo = () => {
+  todos.forEach((todo) => {
+    const listItem = document.createElement("li");
+    listItem.className =
+      "todo-list relative flex items-center w-full py-[0.95rem] px-4 border-b border-bordercolor dark:border-bordercolor-dark transiton-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)] rounded-sm animate-fadeleft";
+
+    listItem.innerHTML = `
+      <input type="checkbox" name="" id="checkbox" class="checkbox absolute top-1/2 left-4 w-[18px] h-[18px] border border-bordercolor dark:border-bordercolor-dark rounded-full -translate-y-1/2 appearance-none outline-none cursor-pointer transition-all duration-500 ease-[cubic-bezier(.37,0,.63,1)] xs:w-6 xs:h-6 checked:bg-gradient-to-t from-[#57ddff] to-[#c058f3] checked:border-none checked:after:absolute checked:after:top-0 checked:after:left-0 checked:after:w-full checked:after:h-full checked:after:content-[''] checked:after:bg-no-repeat checked:after:bg-[50%]"/>
+    
+    <span class="flex-grow  ml-7 xs:ml-[2.2rem] text-color dark:text-color-dark transition-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)]">${todo.title}</span>
+    
+    <button class="flex [all:unset] cursor-pointer">
+      <img src="images/icon-cross.svg" alt=""  class="w-[11px] xs:w-[13px] cursor-pointer delete-btn"/>
+    </button>
+      `;
+
+    todoBox.append(listItem);
+    itemsleft();
+  });
+};
+
+const renderTodo = () => {
   const todoText = inputField.value.trim();
-  const listItem = document.createElement("li");
-  listItem.className =
-    "todo-list relative flex items-center w-full py-[0.95rem] px-4 border-b border-bordercolor dark:border-bordercolor-dark transiton-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)] rounded-sm animate-fadeleft";
-
-  listItem.innerHTML = `
-    <input type="checkbox" name="" id="checkbox" class="checkbox absolute top-1/2 left-4 w-[18px] h-[18px] border border-bordercolor dark:border-bordercolor-dark rounded-full -translate-y-1/2 appearance-none outline-none cursor-pointer transition-all duration-500 ease-[cubic-bezier(.37,0,.63,1)] xs:w-6 xs:h-6 checked:bg-gradient-to-t from-[#57ddff] to-[#c058f3] checked:border-none checked:after:absolute checked:after:top-0 checked:after:left-0 checked:after:w-full checked:after:h-full checked:after:content-[''] checked:after:bg-no-repeat checked:after:bg-[50%]"/>
-  
-  <span class="flex-grow  ml-7 xs:ml-[2.2rem] text-color dark:text-color-dark transition-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)]">${todoText}</span>
-  
-  <button class="flex [all:unset] cursor-pointer">
-    <img src="images/icon-cross.svg" alt=""  class="w-[11px] xs:w-[13px] cursor-pointer delete-btn"/>
-  </button>
-    `;
-
   todos.push({ id: todos.length + 1, title: todoText, iscompleted: false });
+  localStorage.setItem("todos", JSON.stringify(todos));
   inputField.value = "";
-  todoBox.insertBefore(listItem, filterList);
 
-  itemsleft();
+  console.log(todos);
 };
 
 const showEmptyDiv = (milliSeconds) => {
@@ -84,6 +101,19 @@ const showEmptyDiv = (milliSeconds) => {
       todoBox.prepend(emptyTodoDiv);
     }, milliSeconds);
 };
+
+document.addEventListener("DOMContentLoaded", () => {
+  const darkState = localStorage.getItem("isDark");
+  setTheme(darkState);
+
+  // showEmptyDiv();
+  const savedTodos = JSON.parse(localStorage.getItem("todos"));
+  console.log("before", todos);
+  savedTodos.forEach((todo) => {
+    // addTodo();
+  });
+  console.log("after", todos);
+});
 
 const showEmptyDivActive = (boolean, milliSeconds) => {
   const arr = todos.filter((todo) => todo.iscompleted === boolean);
@@ -112,7 +142,7 @@ const deleteTodo = (e) => {
     itemTodelete.classList.add("animate-faderight");
 
     itemTodelete.addEventListener("animationend", () => {
-      todoBox.removeChild(itemTodelete);
+      itemTodelete.remove();
     });
 
     const index = findIndex(allTodos, itemTodelete);
@@ -120,19 +150,19 @@ const deleteTodo = (e) => {
   }
   itemsleft();
   showEmptyDiv(500);
+  localStorage.setItem("todos", JSON.stringify(todos));
 };
 
 // complete Todo
 const completeTodo = (e) => {
-  const checkbox = e.target;
-  const text = checkbox.nextElementSibling;
+  const text = e.target.nextElementSibling;
   const targetTodo = e.target.closest("li");
   const allTodos = document.querySelectorAll(".todo-list");
 
   if (e.target.classList.contains("checkbox")) {
     const index = findIndex(allTodos, targetTodo);
 
-    if (checkbox.checked) {
+    if (e.target.checked) {
       text.classList.add(
         "line-through",
         "text-checkedcolor",
@@ -151,11 +181,13 @@ const completeTodo = (e) => {
     }
   }
   itemsleft();
+  localStorage.setItem("todos", JSON.stringify(todos));
 };
 
 document.querySelector("#input-field").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && inputField.value != "") {
-    addTodo();
+    renderTodo();
+
     emptyTodoDiv.remove();
     console.log("from eventLsitener");
   }
@@ -322,7 +354,12 @@ clearCompletebtn.addEventListener("click", () => {
 
   todos = todos.filter((todo) => todo.iscompleted === false);
   showEmptyDiv();
+  localStorage.setItem("todos", JSON.stringify(todos));
 });
 
 // color issue on first click (serious)
 // why code is executed so many times
+// some little code can be refactor
+
+/////
+// i just want to run
