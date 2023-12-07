@@ -80,6 +80,8 @@ const addTodo = () => {
       listItem.className =
         "todo-list relative flex items-center w-full py-[0.95rem] px-4 border-b border-bordercolor dark:border-bordercolor-dark transiton-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)] rounded-sm animate-fadeleft";
 
+      listItem.draggable = true;
+
       listItem.innerHTML = `
         <input type="checkbox"  name="" id="checkbox" class="checkbox absolute top-1/2 left-4 w-[18px] h-[18px] border border-bordercolor dark:border-bordercolor-dark rounded-full -translate-y-1/2 appearance-none outline-none cursor-pointer transition-all duration-500 ease-[cubic-bezier(.37,0,.63,1)] xs:w-6 xs:h-6 checked:bg-gradient-to-t from-[#57ddff] to-[#c058f3] checked:border-none checked:after:absolute checked:after:top-0 checked:after:left-0 checked:after:w-full checked:after:h-full checked:after:content-[''] checked:after:bg-no-repeat checked:after:bg-[50%]"/>
       
@@ -387,6 +389,48 @@ clearCompletebtn.addEventListener("click", () => {
   todos = todos.filter((todo) => todo.iscompleted === false);
   showEmptyDiv();
   localStorage.setItem("todos", JSON.stringify(todos));
+});
+
+todoBox.addEventListener("dragstart", (e) => {
+  if (e.target.classList.contains("todo-list")) {
+    console.log("i am clicking the todobx");
+    const allTodos = document.querySelectorAll(".todo-list");
+
+    allTodos.forEach((todo) => {
+      todo.addEventListener("dragstart", () => {
+        setTimeout(() => {
+          todo.classList.add("opacity-40");
+          todo.classList.remove("animate-fadeleft");
+        }, 0);
+      });
+    });
+
+    allTodos.forEach((todo) => {
+      todo.addEventListener("dragend", () => {
+        console.log("form drag end");
+        todo.classList.remove("opacity-40");
+      });
+    });
+
+    const initdragging = (e) => {
+      const draggedTodo = document.querySelector(".opacity-40");
+
+      const draggedTodoSiblings = [
+        ...todoBox.querySelectorAll(".todo-list:not(.opacity-40)"),
+      ];
+
+      const draggedTodoNextSibling = draggedTodoSiblings.find((todo) => {
+        return e.clientY <= todo.offsetTop + todo.offsetHeight / 2;
+      });
+
+      console.log(draggedTodoNextSibling);
+
+      todoBox.insertBefore(draggedTodo, draggedTodoNextSibling);
+    };
+
+    todoBox.addEventListener("dragover", initdragging);
+    todoBox.addEventListener("dragenter", (e) => e.preventDefault());
+  }
 });
 
 // color issue on first click (serious)
