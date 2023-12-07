@@ -1,24 +1,3 @@
-/*
-1. Add Todo
-     => .whenever textfield is not empty and user press enter
-             .remove the empty todo div
-             .create a list with a checkbox , user written text , and delete button
-             .append this list in the todolist box
-             .make a function that tells the number of active todos
-2. delete Todo
-3. complete Todo
-     .make text of that todo line through
-     .change result in todos array (iscompleted:true)
-4. itemsleft func
-         .only look for is completed===false and count them and show theri number
-5. filter for all
-6. filter for active
-         . filter for only whose checkbox is checked  and delete them
-7. filter for completed
-8. clear completed
-*/
-// select the both two filter ul and preform the functionality according to which one is clicked
-
 const inputField = document.querySelector("#input-field");
 const todoBox = document.querySelector("#todo-box");
 const emptyTodoDiv = document.querySelector("#empty-todo");
@@ -33,28 +12,7 @@ const clearCompletebtn = document.querySelector(".clear-complete");
 const allFilterbtns = document.querySelectorAll(".filter-btns");
 const body = document.querySelector("body");
 
-// Dark mode
-let isDark = false;
-
-const setTheme = (theme) => {
-  if (theme === true || theme === "true") {
-    body.classList.add("dark");
-    backgroundBanner.src = "images/bg-desktop-dark.jpg";
-    themeSwitcher.src = "images/icon-sun.svg";
-  } else {
-    body.classList.remove("dark");
-    backgroundBanner.src = "images/bg-desktop-light.jpg";
-    themeSwitcher.src = "images/icon-moon.svg";
-  }
-};
-
-themeSwitcher.addEventListener("click", () => {
-  isDark = !isDark;
-  localStorage.setItem("isDark", isDark.toString());
-
-  setTheme(isDark);
-});
-
+// Function to check unchecked todos
 const itemsleft = () => {
   let count = 0;
   todos.filter((todo) => {
@@ -63,13 +21,43 @@ const itemsleft = () => {
   leftTodos.textContent = count;
 };
 
+// Function that prepend emptyTodoDiv based on todos array lenght
+const showEmptyDiv = (milliSeconds) => {
+  if (todos.length === 0) {
+    setTimeout(() => {
+      todoBox.prepend(emptyTodoDiv);
+    }, milliSeconds);
+  } else {
+    emptyTodoDiv.remove();
+  }
+};
+
+// show empty Div for active and complete todos filters
+const showEmptyDivActive = (boolean, milliSeconds) => {
+  const arr = todos.filter((todo) => todo.iscompleted === boolean);
+
+  if (arr.length === 0)
+    setTimeout(() => {
+      todoBox.prepend(emptyTodoDiv);
+    }, milliSeconds);
+};
+
+// Function to find the index between targeted Todo and all Todos
+const findIndex = (all, targeted) => {
+  let index = -1;
+  for (let i = 0; i < all.length; i++) {
+    if (all[i] === targeted) index = i;
+  }
+  return index;
+};
+
 let todos = [];
 
+// Fuction to add Todo
 const addTodo = () => {
   todos.forEach((todo, i) => {
     const todosFromHtml = document.querySelectorAll(".todo-list");
     const todosInArray = Array.from(todosFromHtml);
-    // console.log("todos in array", todosInArray);
 
     if (todo.id === todosInArray[i]?.getAttribute("data-id")) {
       return;
@@ -106,12 +94,14 @@ const addTodo = () => {
           "text-checkedcolor",
           "dark:text-checkedcolor-dark"
         );
+        allTodos[i].classList.add("completed");
       }
     }
   });
   itemsleft();
 };
 
+// fuction that will push the todos in array and make Dom Todos based on them
 const renderTodo = () => {
   const todoText = inputField.value.trim();
   todos.push({
@@ -126,47 +116,7 @@ const renderTodo = () => {
   console.log(todos);
 };
 
-const showEmptyDiv = (milliSeconds) => {
-  if (todos.length === 0) {
-    setTimeout(() => {
-      todoBox.prepend(emptyTodoDiv);
-    }, milliSeconds);
-  } else {
-    emptyTodoDiv.remove();
-  }
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  // for saved dark mode
-  const darkState = localStorage.getItem("isDark");
-  setTheme(darkState);
-
-  // for saved todos
-  const savedTodos = JSON.parse(localStorage.getItem("todos"));
-  savedTodos.forEach((todo) => todos.push(todo));
-  showEmptyDiv();
-
-  addTodo();
-});
-
-const showEmptyDivActive = (boolean, milliSeconds) => {
-  const arr = todos.filter((todo) => todo.iscompleted === boolean);
-
-  if (arr.length === 0)
-    setTimeout(() => {
-      todoBox.prepend(emptyTodoDiv);
-    }, milliSeconds);
-};
-
-const findIndex = (all, targeted) => {
-  let index = -1;
-  for (let i = 0; i < all.length; i++) {
-    if (all[i] === targeted) index = i;
-  }
-  return index;
-};
-
-// Delete Todo
+// Fucntion to perform deletion of a Todo
 const deleteTodo = (e) => {
   const itemTodelete = e.target.closest("li");
   // select all the todo lists
@@ -187,7 +137,7 @@ const deleteTodo = (e) => {
   localStorage.setItem("todos", JSON.stringify(todos));
 };
 
-// complete Todo
+// Fuction to perfrom for completed Todos
 const completeTodo = (e) => {
   const text = e.target.nextElementSibling;
   const targetTodo = e.target.closest("li");
@@ -218,20 +168,7 @@ const completeTodo = (e) => {
   localStorage.setItem("todos", JSON.stringify(todos));
 };
 
-document.querySelector("#input-field").addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && inputField.value != "") {
-    renderTodo();
-
-    emptyTodoDiv.remove();
-    console.log("from eventLsitener");
-  }
-});
-
-todoBox.addEventListener("click", (e) => {
-  deleteTodo(e);
-  completeTodo(e);
-});
-
+// give colol based on click and remove from others
 const giveTargetColor = () => {
   allFilterbtns.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -245,6 +182,7 @@ const giveTargetColor = () => {
   console.log("from target colors function");
 };
 
+// remove all hidden todos
 const removeHidden = () => {
   const allTodoLists = document.querySelectorAll(".todo-list");
   allTodoLists.forEach((todo) => {
@@ -252,6 +190,7 @@ const removeHidden = () => {
   });
 };
 
+// add hidden and animations
 const addHidden = (todo) => {
   todo.classList.add("animate-faderight");
 
@@ -261,6 +200,7 @@ const addHidden = (todo) => {
   }, 500);
 };
 
+// For active todos filter
 const active = () => {
   emptyTodoDiv.remove();
   showEmptyDivActive(false, 0);
@@ -295,7 +235,7 @@ const active = () => {
   });
 };
 
-////////////////////
+// for all Todos filter
 const all = () => {
   emptyTodoDiv.remove();
   showEmptyDiv(0);
@@ -303,7 +243,7 @@ const all = () => {
   removeHidden();
 };
 
-////////////////////
+// for completed Todos filter
 const complete = () => {
   emptyTodoDiv.remove();
   showEmptyDivActive(true, 0);
@@ -379,7 +319,7 @@ completeTodosbtn.forEach((btn) => {
   btn.addEventListener("click", complete);
 });
 
-// clear completes
+// clear completed Todos
 clearCompletebtn.addEventListener("click", () => {
   const allCompleteTodos = document.querySelectorAll(".completed");
   allCompleteTodos.forEach((todo) => {
@@ -391,6 +331,7 @@ clearCompletebtn.addEventListener("click", () => {
   localStorage.setItem("todos", JSON.stringify(todos));
 });
 
+// Drag and Drop Feature
 todoBox.addEventListener("dragstart", (e) => {
   if (e.target.classList.contains("todo-list")) {
     console.log("i am clicking the todobx");
@@ -399,7 +340,7 @@ todoBox.addEventListener("dragstart", (e) => {
     allTodos.forEach((todo) => {
       todo.addEventListener("dragstart", () => {
         setTimeout(() => {
-          todo.classList.add("opacity-40");
+          todo.classList.add("opacity-40", "bg-[#c0c0c0]");
           todo.classList.remove("animate-fadeleft");
         }, 0);
       });
@@ -409,6 +350,7 @@ todoBox.addEventListener("dragstart", (e) => {
       todo.addEventListener("dragend", () => {
         console.log("form drag end");
         todo.classList.remove("opacity-40");
+        todo.classList.remove("bg-[#c0c0c0]");
       });
     });
 
@@ -433,9 +375,56 @@ todoBox.addEventListener("dragstart", (e) => {
   }
 });
 
+// Dark mode
+let isDark = false;
+
+const setTheme = (theme) => {
+  if (theme === true || theme === "true") {
+    body.classList.add("dark");
+    backgroundBanner.src = "images/bg-desktop-dark.jpg";
+    themeSwitcher.src = "images/icon-sun.svg";
+  } else {
+    body.classList.remove("dark");
+    backgroundBanner.src = "images/bg-desktop-light.jpg";
+    themeSwitcher.src = "images/icon-moon.svg";
+  }
+};
+
+// Global EventListners
+themeSwitcher.addEventListener("click", () => {
+  isDark = !isDark;
+  localStorage.setItem("isDark", isDark.toString());
+
+  setTheme(isDark);
+});
+
+document.querySelector("#input-field").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && inputField.value != "") {
+    renderTodo();
+
+    emptyTodoDiv.remove();
+    console.log("from eventLsitener");
+  }
+});
+
+todoBox.addEventListener("click", (e) => {
+  deleteTodo(e);
+  completeTodo(e);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  // for saved dark mode
+  const darkState = localStorage.getItem("isDark");
+  setTheme(darkState);
+
+  // for saved todos
+  const savedTodos = JSON.parse(localStorage.getItem("todos"));
+  savedTodos.forEach((todo) => todos.push(todo));
+  showEmptyDiv();
+
+  addTodo();
+});
+
 // color issue on first click (serious)
 // why code is executed so many times
 // some little code can be refactor
-
-/////
-// if todolist is already avialble from that index of array dont make it again if it is not aviable make todolist
