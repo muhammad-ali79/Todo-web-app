@@ -73,7 +73,7 @@ const addTodo = () => {
       listItem.innerHTML = `
         <input type="checkbox"  name="" id="checkbox" class="checkbox absolute top-1/2 left-4 w-[18px] h-[18px] border border-bordercolor dark:border-bordercolor-dark rounded-full -translate-y-1/2 appearance-none outline-none cursor-pointer transition-all duration-500 ease-[cubic-bezier(.37,0,.63,1)] xs:w-6 xs:h-6 checked:bg-gradient-to-t from-[#57ddff] to-[#c058f3] checked:border-none checked:after:absolute checked:after:top-0 checked:after:left-0 checked:after:w-full checked:after:h-full checked:after:content-[''] checked:after:bg-no-repeat checked:after:bg-[50%]"/>
       
-      <span class="todo-text flex-grow  ml-7 xs:ml-[2.2rem] text-color dark:text-color-dark transition-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)]">${todo.title}</span>
+      <span class="todo-text flex-grow  ml-7 xs:ml-[2.2rem] text-color dark:text-color-dark transition-colors duration-500 ease-[cubic-bezier(.37,0,.63,1)] focus:outline-none">${todo.title}</span>
       
       <button class="flex [all:unset] cursor-pointer">
         <img src="images/icon-cross.svg" alt=""  class="w-[11px] xs:w-[13px] cursor-pointer delete-btn"/>
@@ -422,7 +422,44 @@ document.addEventListener("DOMContentLoaded", () => {
   savedTodos.forEach((todo) => todos.push(todo));
   showEmptyDiv();
 
+  console.log(todos);
   addTodo();
+});
+
+// renamer process
+//  if user click more than two times on a text allow the user to rename the todo
+// after pressing enter or outside anywhere saved the new text
+// find index of the todo which text has been changed and also change his index in the todos array
+
+// Rename Todo
+todoBox.addEventListener("click", (e) => {
+  if (e.target.classList.contains("todo-text")) {
+    e.target.addEventListener("dblclick", (e) => {
+      e.target.style.cursor = "text";
+      e.target.contentEditable = true;
+      e.target.style.outline = "none";
+    });
+
+    e.target.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.target.blur();
+
+        // change the title in the todos array
+        const editableParentLi = e.target.closest("li");
+        const allTodos = document.querySelectorAll(".todo-list");
+
+        const indexToChangeTitle = findIndex(allTodos, editableParentLi);
+        todos[indexToChangeTitle].title = e.target.textContent;
+        localStorage.setItem("todos", JSON.stringify(todos));
+      }
+    });
+
+    e.target.addEventListener("blur", (e) => {
+      e.target.style.cursor = "default";
+      e.target.contentEditable = false;
+    });
+  }
 });
 
 // color issue on first click (serious)
