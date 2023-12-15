@@ -1,3 +1,5 @@
+"use strict";
+
 const inputField = document.querySelector("#input-field");
 const todoBox = document.querySelector("#todo-box");
 const emptyTodoDiv = document.querySelector("#empty-todo");
@@ -36,10 +38,13 @@ const showEmptyDiv = (milliSeconds) => {
 const showEmptyDivActive = (boolean, milliSeconds) => {
   const arr = todos.filter((todo) => todo.iscompleted === boolean);
 
-  if (arr.length === 0)
+  if (arr.length === 0) {
     setTimeout(() => {
       todoBox.prepend(emptyTodoDiv);
     }, milliSeconds);
+  } else {
+    emptyTodoDiv.remove();
+  }
 };
 
 // Function to find the index between targeted Todo and all Todos
@@ -168,7 +173,7 @@ const completeTodo = (e) => {
   localStorage.setItem("todos", JSON.stringify(todos));
 };
 
-// give colol based on click and remove from others
+// give color based on click and remove from others
 const giveTargetColor = () => {
   allFilterbtns.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -248,18 +253,18 @@ const complete = () => {
   emptyTodoDiv.remove();
   showEmptyDivActive(true, 0);
   giveTargetColor();
+  removeHidden();
 
   const addHiddenComplete = () => {
-    const allTodoLists = document.querySelectorAll(".todo-list");
+    const allTodoLists = document.querySelectorAll(
+      ".todo-list:not(.completed)"
+    );
 
     allTodoLists.forEach((todo) => {
-      if (!todo.classList.contains("completed")) {
-        addHidden(todo);
-      }
+      addHidden(todo);
     });
   };
 
-  removeHidden();
   addHiddenComplete();
 
   const hasColor = () => {
@@ -332,46 +337,82 @@ clearCompletebtn.addEventListener("click", () => {
 });
 
 // Drag and Drop Feature
+let dragitem = null;
+
 todoBox.addEventListener("dragstart", (e) => {
   if (e.target.classList.contains("todo-list")) {
-    console.log("i am clicking the todobx");
     const allTodos = document.querySelectorAll(".todo-list");
 
     allTodos.forEach((todo) => {
       todo.addEventListener("dragstart", () => {
         setTimeout(() => {
           todo.classList.add("opacity-40", "bg-[#c0c0c0]");
-          todo.classList.remove("animate-fadeleft");
+          todo.classList.remove(
+            "animate-fadeleft",
+            "transiton-colors",
+            "duration-500"
+          );
         }, 0);
       });
-    });
 
-    allTodos.forEach((todo) => {
       todo.addEventListener("dragend", () => {
         console.log("form drag end");
-        todo.classList.remove("opacity-40");
-        todo.classList.remove("bg-[#c0c0c0]");
+        todo.classList.remove("opacity-40", "bg-[#c0c0c0]");
+
+        todo.classList.add("animate-fadeleft");
+      });
+
+      todo.addEventListener("dragover", (e) => {
+        console.log("from dragover");
+        e.preventDefault();
+      });
+
+      // const initdragging = (e) => {
+      //   const draggedTodo = document.querySelector(".opacity-40");
+
+      //   const draggedTodoSiblings = [
+      //     ...todoBox.querySelectorAll(".todo-list:not(.opacity-40)"),
+      //   ];
+
+      //   const draggedTodoNextSibling = draggedTodoSiblings.find((todo) => {
+      //     return e.clientY <= todo.offsetTop + todo.offsetHeight / 2;
+      //   });
+      //   const lastElement = todoBox.lastElementChild;
+      //   const index = Array.from(todoBox.children).indexOf(lastElement);
+
+      //   const currentDraggedElement = document.querySelector(".opacity-40");
+      //   const draggedIndex = Array.from(todoBox.children).indexOf(
+      //     currentDraggedElement
+      //   );
+
+      //   console.log(draggedIndex);
+
+      //   if (draggedIndex < index)
+      //     todoBox.insertBefore(draggedTodo, draggedTodoNextSibling);
+      // };
+
+      todo.addEventListener("drop", function (e) {
+        // const lastElement = todoBox.lastElementChild;
+        // const lastIndex = Array.from(todoBox.children).indexOf(lastElement);
+
+        // const currentDraggedElement = document.querySelector(".opacity-40");
+        // const draggedIndex = Array.from(todoBox.children).indexOf(
+        //   currentDraggedElement
+        // );
+
+        const draggedTodoSiblings = [
+          ...todoBox.querySelectorAll(".todo-list:not(.opacity-40)"),
+        ];
+
+        const draggedTodoNextSibling = draggedTodoSiblings.find((todo) => {
+          return e.clientY <= todo.offsetTop + todo.offsetHeight / 2;
+        });
+
+        if (draggedTodoNextSibling !== undefined) {
+          todoBox.insertBefore(currentDraggedElement, draggedTodoNextSibling);
+        }
       });
     });
-
-    const initdragging = (e) => {
-      const draggedTodo = document.querySelector(".opacity-40");
-
-      const draggedTodoSiblings = [
-        ...todoBox.querySelectorAll(".todo-list:not(.opacity-40)"),
-      ];
-
-      const draggedTodoNextSibling = draggedTodoSiblings.find((todo) => {
-        return e.clientY <= todo.offsetTop + todo.offsetHeight / 2;
-      });
-
-      console.log(draggedTodoNextSibling);
-
-      todoBox.insertBefore(draggedTodo, draggedTodoNextSibling);
-    };
-
-    todoBox.addEventListener("dragover", initdragging);
-    todoBox.addEventListener("dragenter", (e) => e.preventDefault());
   }
 });
 
@@ -426,18 +467,12 @@ document.addEventListener("DOMContentLoaded", () => {
   addTodo();
 });
 
-// renamer process
-//  if user click more than two times on a text allow the user to rename the todo
-// after pressing enter or outside anywhere saved the new text
-// find index of the todo which text has been changed and also change his index in the todos array
-
 // Rename Todo
 todoBox.addEventListener("click", (e) => {
   if (e.target.classList.contains("todo-text")) {
     e.target.addEventListener("dblclick", (e) => {
       e.target.style.cursor = "text";
       e.target.contentEditable = true;
-      e.target.style.outline = "none";
     });
 
     e.target.addEventListener("keydown", (e) => {
@@ -462,6 +497,9 @@ todoBox.addEventListener("click", (e) => {
   }
 });
 
-// color issue on first click (serious)
+// why things are not happening on first click
+// make a limit for drag and drop
 // why code is executed so many times
 // some little code can be refactor
+
+// dont drop the element after after the last element
