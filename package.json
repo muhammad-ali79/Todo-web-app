@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "npx tailwindcss build -i src/input.css -o dist/output.css --watch"
+    "build": "npx tailwindcss build -i src/input.css -o dist/output.css"
   },
   "devDependencies": {
     "prettier": "^3.1.0",
