@@ -1,6 +1,10 @@
 {
   "scripts": {
-    "build": "npx tailwindcss build -i src/input.css -o public/output.css"
+    "build:css": "npx tailwindcss build -i src/input.css -o public/output.css",
+    "copy:html": "cp src/index.html public/index.html",
+    "copy:js": "mkdir -p public/scripts/ && cp src/scripts/script.js public/scripts/script.js",
+    "copy:images": "cp -R src/images public/images",
+    "build": "npm run build:css && npm run copy:html && npm run copy:js && npm run copy:images"
   },
   "devDependencies": {
     "prettier": "^3.1.0",
