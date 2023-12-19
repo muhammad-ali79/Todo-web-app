@@ -337,8 +337,6 @@ clearCompletebtn.addEventListener("click", () => {
 });
 
 // Drag and Drop Feature
-let dragitem = null;
-
 todoBox.addEventListener("dragstart", (e) => {
   if (e.target.classList.contains("todo-list")) {
     const allTodos = document.querySelectorAll(".todo-list");
@@ -367,38 +365,8 @@ todoBox.addEventListener("dragstart", (e) => {
         e.preventDefault();
       });
 
-      // const initdragging = (e) => {
-      //   const draggedTodo = document.querySelector(".opacity-40");
-
-      //   const draggedTodoSiblings = [
-      //     ...todoBox.querySelectorAll(".todo-list:not(.opacity-40)"),
-      //   ];
-
-      //   const draggedTodoNextSibling = draggedTodoSiblings.find((todo) => {
-      //     return e.clientY <= todo.offsetTop + todo.offsetHeight / 2;
-      //   });
-      //   const lastElement = todoBox.lastElementChild;
-      //   const index = Array.from(todoBox.children).indexOf(lastElement);
-
-      //   const currentDraggedElement = document.querySelector(".opacity-40");
-      //   const draggedIndex = Array.from(todoBox.children).indexOf(
-      //     currentDraggedElement
-      //   );
-
-      //   console.log(draggedIndex);
-
-      //   if (draggedIndex < index)
-      //     todoBox.insertBefore(draggedTodo, draggedTodoNextSibling);
-      // };
-
       todo.addEventListener("drop", function (e) {
-        // const lastElement = todoBox.lastElementChild;
-        // const lastIndex = Array.from(todoBox.children).indexOf(lastElement);
-
-        // const currentDraggedElement = document.querySelector(".opacity-40");
-        // const draggedIndex = Array.from(todoBox.children).indexOf(
-        //   currentDraggedElement
-        // );
+        const currentDraggedElement = document.querySelector(".opacity-40");
 
         const draggedTodoSiblings = [
           ...todoBox.querySelectorAll(".todo-list:not(.opacity-40)"),
@@ -502,4 +470,4 @@ todoBox.addEventListener("click", (e) => {
 // why code is executed so many times
 // some little code can be refactor
 
-// dont drop the element after after the last element
+i;
