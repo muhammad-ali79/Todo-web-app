@@ -1,10 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  purge: {
-    enabled: true,
-    content: ["./src/**/*.{html,js}"], // Paths to your templates and JavaScript files
-    // More options here as needed
-  },
+  content: ["./src/**/*.{html,js}"],
 
   darkMode: "class",
   theme: {
